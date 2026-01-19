@@ -5,12 +5,10 @@ const Bus = require("../models/Bus");
 const Seat = require("../models/Seat");
 const Booking = require("../models/Booking");
 
-const auth = require("../middleware/auth");
 const { auth, adminOnly } = require("../middleware/auth");
 
-
 /* =========================
-   ADD BUS
+   ADD BUS (ADMIN)
 ========================= */
 router.post("/add", auth, adminOnly, async (req, res) => {
   try {
@@ -27,7 +25,8 @@ router.post("/add", auth, adminOnly, async (req, res) => {
     for (let i = 1; i <= seats; i++) {
       await Seat.create({
         busId: bus._id,
-        seatNo: i
+        seatNo: i,
+        isBooked: false
       });
     }
 
@@ -39,7 +38,7 @@ router.post("/add", auth, adminOnly, async (req, res) => {
 });
 
 /* =========================
-   DELETE BUS
+   DELETE BUS (ADMIN)
 ========================= */
 router.delete("/delete/:id", auth, adminOnly, async (req, res) => {
   try {
