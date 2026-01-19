@@ -28,3 +28,18 @@ router.get("/my-bookings", auth, async(req,res)=>{
 });
 
 module.exports = router;
+
+router.post("/cancel", auth, async (req, res) => {
+  const { bookingId } = req.body;
+
+  const booking = await Booking.findById(bookingId);
+  if (!booking) return res.json({ message: "Booking not found" });
+
+  await Seat.findOneAndUpdate(
+    { busId: booking.busId, seatNo: booking.seatNo },
+    { isBooked: false }
+  );
+
+  await booking.deleteOne();
+  res.json({ message: "Booking cancelled" });
+});
