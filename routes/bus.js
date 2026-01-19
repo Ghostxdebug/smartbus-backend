@@ -6,7 +6,8 @@ const Seat = require("../models/Seat");
 const Booking = require("../models/Booking");
 
 const auth = require("../middleware/auth");
-const adminOnly = require("../middleware/adminOnly");
+const { auth, adminOnly } = require("../middleware/auth");
+
 
 /* =========================
    ADD BUS
