@@ -43,11 +43,13 @@ router.post("/book", auth, async (req, res) => {
 
 
 router.get("/my-bookings", auth, async (req, res) => {
-  const bookings = await Booking.find({ userId: req.user.id })
-    .populate("busId", "busNumber route");
+  const bookings = await Booking.find({
+    userId: req.user.id
+  }).populate("busId", "busNumber route");
 
   res.json(bookings);
 });
+
 
 
 module.exports = router;
