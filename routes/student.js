@@ -50,6 +50,14 @@ router.get("/my-bookings", auth, async (req, res) => {
   res.json(bookings);
 });
 
+router.get("/bus/:id", auth, async (req, res) => {
+  const bus = await Bus.findById(req.params.id);
+  if (!bus) {
+    return res.status(404).json({ message: "Bus not found" });
+  }
+  res.json(bus);
+});
+
 
 
 module.exports = router;

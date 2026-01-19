@@ -13,4 +13,27 @@ router.post("/add", auth, adminOnly, async (req,res)=>{
   res.json({message:"Bus added"});
 });
 
+const bus = await Bus.create({
+  busNumber,
+  route,
+  seats,
+  schedule
+});
+
+router.delete("/delete/:id", auth, adminOnly, async (req, res) => {
+  const busId = req.params.id;
+
+  // Remove related seats
+  await Seat.deleteMany({ busId });
+
+  // Remove related bookings
+  await Booking.deleteMany({ busId });
+
+  // Remove bus
+  await Bus.findByIdAndDelete(busId);
+
+  res.json({ message: "Bus deleted successfully" });
+});
+
+
 module.exports = router;
