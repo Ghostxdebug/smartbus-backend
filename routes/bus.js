@@ -1,39 +1,58 @@
 const express = require("express");
-const Bus = require("../models/Bus");
-const Seat = require("../models/Seat");
-const {auth,adminOnly} = require("../middleware/auth");
-
 const router = express.Router();
 
-router.post("/add", auth, adminOnly, async (req,res)=>{
-  const bus = await Bus.create(req.body);
-  for(let i=1;i<=req.body.seats;i++){
-    await Seat.create({busId:bus._id, seatNo:i});
+const Bus = require("../models/Bus");
+const Seat = require("../models/Seat");
+const Booking = require("../models/Booking");
+
+const auth = require("../middleware/auth");
+const adminOnly = require("../middleware/adminOnly");
+
+/* =========================
+   ADD BUS
+========================= */
+router.post("/add", auth, adminOnly, async (req, res) => {
+  try {
+    const { busNumber, route, seats, schedule } = req.body;
+
+    const bus = await Bus.create({
+      busNumber,
+      route,
+      seats,
+      schedule
+    });
+
+    // Create seats
+    for (let i = 1; i <= seats; i++) {
+      await Seat.create({
+        busId: bus._id,
+        seatNo: i
+      });
+    }
+
+    res.json({ message: "Bus added successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to add bus" });
   }
-  res.json({message:"Bus added"});
 });
 
-const bus = await Bus.create({
-  busNumber,
-  route,
-  seats,
-  schedule
-});
-
+/* =========================
+   DELETE BUS
+========================= */
 router.delete("/delete/:id", auth, adminOnly, async (req, res) => {
-  const busId = req.params.id;
+  try {
+    const busId = req.params.id;
 
-  // Remove related seats
-  await Seat.deleteMany({ busId });
+    await Seat.deleteMany({ busId });
+    await Booking.deleteMany({ busId });
+    await Bus.findByIdAndDelete(busId);
 
-  // Remove related bookings
-  await Booking.deleteMany({ busId });
-
-  // Remove bus
-  await Bus.findByIdAndDelete(busId);
-
-  res.json({ message: "Bus deleted successfully" });
+    res.json({ message: "Bus deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to delete bus" });
+  }
 });
-
 
 module.exports = router;
