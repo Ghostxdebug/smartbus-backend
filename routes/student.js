@@ -2,7 +2,7 @@ const express = require("express");
 const Bus = require("../models/Bus");
 const Seat = require("../models/Seat");
 const Booking = require("../models/Booking");
-const auth = require("../middleware/auth");
+const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -91,7 +91,4 @@ router.post("/cancel", auth, async (req, res) => {
   res.json({ message: "Booking cancelled" });
 });
 
-/* =========================
-   EXPORT ROUTER (MUST BE LAST)
-========================= */
 module.exports = router;
