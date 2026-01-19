@@ -11,6 +11,7 @@ router.get("/bookings", auth, adminOnly, async (req, res) => {
   res.json(bookings);
 });
 
+
 router.post("/cancel-booking", auth, adminOnly, async (req, res) => {
   const { bookingId } = req.body;
 

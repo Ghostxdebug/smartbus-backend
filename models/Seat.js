@@ -1,7 +1,19 @@
 const mongoose = require("mongoose");
 
-module.exports = mongoose.model("Seat", new mongoose.Schema({
-  busId: mongoose.Schema.Types.ObjectId,
-  seatNo: Number,
-  isBooked: { type: Boolean, default: false }
-}));
+const seatSchema = new mongoose.Schema({
+  busId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Bus",
+    required: true
+  },
+  seatNo: {
+    type: Number,
+    required: true
+  },
+  isBooked: {
+    type: Boolean,
+    default: false
+  }
+});
+
+module.exports = mongoose.model("Seat", seatSchema);

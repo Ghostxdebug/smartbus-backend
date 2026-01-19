@@ -13,19 +13,42 @@ router.get("/buses", auth, async(req,res)=>{
 router.get("/seats/:busId", auth, async(req,res)=>{
   res.json(await Seat.find({busId:req.params.busId}));
 });
+router.post("/book", auth, async (req, res) => {
+  const { busId, seatNo } = req.body;
 
-router.post("/book", auth, async(req,res)=>{
-  const seat = await Seat.findOne(req.body);
-  if(seat.isBooked) return res.json({message:"Already booked"});
-  seat.isBooked=true;
+  // Find seat
+  const seat = await Seat.findOne({ busId, seatNo });
+
+  if (!seat) {
+    return res.status(404).json({ message: "Seat not found" });
+  }
+
+  if (seat.isBooked) {
+    return res.status(400).json({ message: "Seat already booked" });
+  }
+
+  // Mark seat booked
+  seat.isBooked = true;
   await seat.save();
-  await Booking.create({...req.body, userId:req.user.id});
-  res.json({message:"Booked"});
+
+  // Create booking
+  await Booking.create({
+    userId: req.user.id,
+    busId,
+    seatNo
+  });
+
+  res.json({ message: "Seat booked successfully" });
 });
 
-router.get("/my-bookings", auth, async(req,res)=>{
-  res.json(await Booking.find({userId:req.user.id}).populate("busId"));
+
+router.get("/my-bookings", auth, async (req, res) => {
+  const bookings = await Booking.find({ userId: req.user.id })
+    .populate("busId", "busNumber route");
+
+  res.json(bookings);
 });
+
 
 module.exports = router;
 
